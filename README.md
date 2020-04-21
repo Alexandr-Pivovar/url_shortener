@@ -37,3 +37,7 @@
 1. Сборка: `docker build -t url_shortener .`
 2. Запуск: `docker run -p 8000:8000 url_shortener:latest .`
 3. доступен по адресу `http://{dockerhost}:8000/`
+
+## Run tests
+
+./test.sh
