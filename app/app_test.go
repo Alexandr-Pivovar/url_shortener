@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -76,15 +77,28 @@ func TestUrlService_Get(t *testing.T) {
 		url      string
 	}{
 		{
-			testName: "Should return url if all is ok",
+			testName: "Should return originUrl if all is ok",
 			wantUrl:  "http://google.com",
 			url:      "asd123",
 			repo: func() *MockUrlRepository {
 				m := &MockUrlRepository{}
 				m.On("Get", "asd123").
-					Return("http://google.com", nil)
+					Return("http://google.com", nil).Once()
 				return m
 			}(),
+		},
+		{
+			testName: "Should return error if originUrl does not exist",
+			wantUrl:  "",
+			url:      "asd123",
+			repo: func() *MockUrlRepository {
+				m := &MockUrlRepository{}
+				m.On("Get", "asd123").
+					Return("", errors.New("key does not exist")).
+					Once()
+				return m
+			}(),
+			wantErr: errors.New("key does not exist"),
 		},
 	}
 
@@ -97,6 +111,71 @@ func TestUrlService_Get(t *testing.T) {
 			// assert
 			assert.Equal(t, c.wantErr, gotErr)
 			assert.Equal(t, c.wantUrl, gotUrl)
+
+			c.repo.AssertExpectations(t)
+		})
+	}
+}
+
+func TestNewUrlService_Create(t *testing.T) {
+	// arrange
+	cases := []struct {
+		testName  string
+		repo      *MockUrlRepository
+		gen       *MockGenerator
+		wantUrl   string
+		originUrl string
+	}{
+		{
+			testName:  "Should return short url if repo does not return error",
+			wantUrl:   "localhost/asd123",
+			originUrl: "http://google.com",
+			gen: func() *MockGenerator {
+				m := &MockGenerator{}
+				m.On("Generate").Return("asd123")
+				return m
+			}(),
+			repo: func() *MockUrlRepository {
+				m := &MockUrlRepository{}
+				m.On("Save", "asd123", "http://google.com").
+					Return(nil).Once()
+				return m
+			}(),
+		},
+		{
+			testName:  "Should return short url if repo.Save returns error",
+			wantUrl:   "localhost/asd123",
+			originUrl: "http://google.com",
+			repo: func() *MockUrlRepository {
+				m := &MockUrlRepository{}
+				m.On("Save", "asd123", "http://google.com").
+					Return(errors.New("key does not exist")).
+					Once()
+				m.On("Get", "asd123").
+					Return("http://google.com", nil).
+					Once()
+				return m
+			}(),
+			gen: func() *MockGenerator {
+				m := &MockGenerator{}
+				m.On("Generate").Return("asd123")
+				return m
+			}(),
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.testName, func(t *testing.T) {
+
+			// act
+			s := NewUrlService(c.repo, c.gen, "localhost/")
+			gotUrl := s.Create(c.originUrl)
+
+			// assert
+			assert.Equal(t, c.wantUrl, gotUrl)
+
+			c.repo.AssertExpectations(t)
+			c.gen.AssertExpectations(t)
 		})
 	}
 }

@@ -30,7 +30,7 @@ func (_m *MockUrlRepository) Get(key string) (string, error) {
 	return r0, r1
 }
 
-// Save provides a mock function with given fields: key, url
+// Save provides a mock function with given fields: key, originUrl
 func (_m *MockUrlRepository) Save(key string, url string) error {
 	ret := _m.Called(key, url)
 

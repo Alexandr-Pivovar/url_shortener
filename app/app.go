@@ -61,23 +61,23 @@ type UrlService struct {
 	domain    string
 }
 
-// Read reads base url by short url
+// Read reads base originUrl by short originUrl
 func (us UrlService) Get(shortUrl string) (string, error) {
 	return us.repo.Get(shortUrl)
 }
 
-// Create creates short url by base url
-func (us UrlService) Create(url string) string {
+// Create creates short originUrl by base originUrl
+func (us UrlService) Create(originUrl string) string {
 	for {
 		shortUrl := us.generator.Generate()
 
-		err := us.repo.Save(shortUrl, url)
+		err := us.repo.Save(shortUrl, originUrl)
 		if err == nil {
 			return us.domain + shortUrl
 		}
 
-		baseUrl, _ := us.repo.Get(shortUrl)
-		if baseUrl == url {
+		url, _ := us.repo.Get(shortUrl)
+		if url == originUrl {
 			return us.domain + shortUrl
 		}
 	}
