@@ -90,8 +90,8 @@ type UrlGenerator struct {
 }
 
 // NewUrlGenerator creates new UrlGenerator instance
-func NewUrlGenerator(characters string, bufSize int) UrlGenerator {
-	return UrlGenerator{
+func NewUrlGenerator(characters string, bufSize int) *UrlGenerator {
+	return &UrlGenerator{
 		characters: characters,
 		pool: func() *sync.Pool {
 			return &sync.Pool{
