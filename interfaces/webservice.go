@@ -2,9 +2,10 @@ package interfaces
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 	"url_shortener/app"
 )
 

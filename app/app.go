@@ -22,15 +22,17 @@ type UrlServicer interface {
 	Create(url string) string
 }
 
-//go:generate mockery -name UrlRepository -case underscore -inpkg
 // UrlRepository interface for working with interfaces
+//
+//go:generate mockery -name UrlRepository -case underscore -inpkg
 type UrlRepository interface {
 	Save(key, url string) error
 	Get(key string) (string, error)
 }
 
-//go:generate mockery -name Generator -case underscore -inpkg
 // Generator interface for generating a random strings
+//
+//go:generate mockery -name Generator -case underscore -inpkg
 type Generator interface {
 	Generate() string
 }
